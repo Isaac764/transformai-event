@@ -5,7 +5,7 @@ import Image from "next/image";
 
 export default function PagamentoPage() {
 
-  const [method, setMethod] = useState<"pix" | "card">("pix");
+  const [method, setMethod] = useState("pix");
 
   const pixCode =
     "00020126360014BR.GOV.BCB.PIX0114+5598999999995204000053039865406100.005802BR5925TRANSFORMAI6009SAOLUIS62070503***6304ABCD";
@@ -89,9 +89,10 @@ export default function PagamentoPage() {
 
             {/* PIX */}
 
-            <button
+            <div
               onClick={() => setMethod("pix")}
               className={`
+              cursor-pointer
               w-full
               p-8
               rounded-3xl
@@ -119,13 +120,14 @@ export default function PagamentoPage() {
 
               </p>
 
-            </button>
+            </div>
 
             {/* CARTÃO */}
 
-            <button
+            <div
               onClick={() => setMethod("card")}
               className={`
+              cursor-pointer
               w-full
               p-8
               rounded-3xl
@@ -153,7 +155,7 @@ export default function PagamentoPage() {
 
               </p>
 
-            </button>
+            </div>
 
           </div>
 
@@ -163,88 +165,88 @@ export default function PagamentoPage() {
 
             {/* PIX */}
 
-            {method === "pix" && (
+            <div className="mt-10">
 
-              <div className="animate-in fade-in duration-300">
+              {method === "pix" ? (
 
-                <div className="bg-white rounded-3xl p-6 w-fit mx-auto">
+                <div>
 
-                  <Image
-                    src="/images/qrcode-pix.png"
-                    alt="QR Code PIX"
-                    width={280}
-                    height={280}
-                  />
+                  <div className="bg-white rounded-3xl p-6 w-fit mx-auto">
+
+                    <Image
+                      src="/images/qrcode-pix.png"
+                      alt="QR Code PIX"
+                      width={280}
+                      height={280}
+                    />
+
+                  </div>
+
+                  <div className="bg-black border border-zinc-700 rounded-2xl p-5 mt-8 text-sm break-all">
+
+                    {pixCode}
+
+                  </div>
+
+                  <button
+                    onClick={copyPixCode}
+                    className="w-full mt-6 bg-green-500 hover:bg-green-400 transition py-5 rounded-2xl text-xl font-black"
+                  >
+
+                    COPIAR CÓDIGO PIX
+
+                  </button>
 
                 </div>
 
-                <div className="bg-black border border-zinc-700 rounded-2xl p-5 mt-8 text-sm break-all">
+              ) : (
 
-                  {pixCode}
-
-                </div>
-
-                <button
-                  onClick={copyPixCode}
-                  className="w-full mt-6 bg-green-500 hover:bg-green-400 transition py-5 rounded-2xl text-xl font-black"
-                >
-
-                  COPIAR CÓDIGO PIX
-
-                </button>
-
-              </div>
-
-            )}
-
-            {/* CARTÃO */}
-
-            {method === "card" && (
-
-              <div className="space-y-5 animate-in fade-in duration-300">
-
-                <input
-                  placeholder="Número do cartão"
-                  className="w-full bg-black border border-zinc-700 rounded-2xl p-5 text-lg"
-                />
-
-                <input
-                  placeholder="Nome no cartão"
-                  className="w-full bg-black border border-zinc-700 rounded-2xl p-5 text-lg"
-                />
-
-                <div className="grid grid-cols-2 gap-5">
+                <div className="space-y-5">
 
                   <input
-                    placeholder="MM/AA"
+                    placeholder="Número do cartão"
                     className="w-full bg-black border border-zinc-700 rounded-2xl p-5 text-lg"
                   />
 
                   <input
-                    placeholder="CVV"
+                    placeholder="Nome no cartão"
                     className="w-full bg-black border border-zinc-700 rounded-2xl p-5 text-lg"
                   />
 
+                  <div className="grid grid-cols-2 gap-5">
+
+                    <input
+                      placeholder="MM/AA"
+                      className="w-full bg-black border border-zinc-700 rounded-2xl p-5 text-lg"
+                    />
+
+                    <input
+                      placeholder="CVV"
+                      className="w-full bg-black border border-zinc-700 rounded-2xl p-5 text-lg"
+                    />
+
+                  </div>
+
                 </div>
 
-              </div>
+              )}
 
-            )}
+            </div>
+
+            {/* BOTÃO */}
+
+            <button
+              onClick={() =>
+                window.location.href = "/sucesso"
+              }
+              className="w-full mt-10 bg-green-500 hover:bg-green-400 transition py-6 rounded-2xl text-2xl font-black"
+            >
+
+              FINALIZAR PAGAMENTO
+
+            </button>
 
           </div>
-
-          {/* BOTÃO */}
-
-          <button
-            onClick={() =>
-              window.location.href = "/sucesso"
-            }
-            className="w-full mt-10 bg-green-500 hover:bg-green-400 transition py-6 rounded-2xl text-2xl font-black"
-          >
-
-            FINALIZAR PAGAMENTO
-
-          </button>
 
         </div>
 
