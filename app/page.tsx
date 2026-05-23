@@ -536,11 +536,30 @@ function handleSubmit() {
             </div>
 
             <button
-                onClick={scrollToForm}
-                className="hidden lg:block bg-green-500 hover:bg-green-400 transition px-8 py-4 rounded-xl font-black"
-              >
+              onClick={handleSubmit}
+              disabled={
+                !form.nome ||
+                !form.email ||
+                !form.whatsapp
+              }
+              className="
+              w-full
+              mt-10
+              bg-green-500
+              hover:bg-green-400
+              disabled:bg-zinc-700
+              disabled:opacity-50
+              disabled:cursor-not-allowed
+              transition-all
+              duration-300
+              py-6
+              rounded-2xl
+              text-2xl
+              font-black
+              "
+            >
 
-                 GARANTIR MINHA VAGA
+              GARANTIR MINHA VAGA
 
             </button>
 
