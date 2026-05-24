@@ -27,7 +27,7 @@ function scrollToForm() {
   });
 }
 
-function handleSubmit() {
+async function handleSubmit() {
 
   if (
     !form.nome ||
@@ -38,16 +38,48 @@ function handleSubmit() {
     return;
   }
 
-  // SALVA TEMPORARIAMENTE
+  try {
 
-  localStorage.setItem(
-    "transformai-user",
-    JSON.stringify(form)
-  );
+    const response = await fetch(
+      "/api/pagbank",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+        body: JSON.stringify(form)
+      }
+    );
 
-  // REDIRECIONA
+    const data = await response.json();
 
-  window.location.href = "/pagamento";
+    console.log(data);
+
+    // REDIRECIONAR
+
+    if (data.checkout_url) {
+
+      window.location.href =
+        data.checkout_url;
+
+    } else {
+
+      alert(
+        "Erro ao gerar pagamento."
+      );
+
+    }
+
+  } catch (error) {
+
+    console.log(error);
+
+    alert(
+      "Erro ao processar pagamento."
+    );
+
+  }
 
 }
 

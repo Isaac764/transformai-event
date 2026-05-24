@@ -1,14 +1,16 @@
-import axios, { isAxiosError } from "axios";
+import axios from "axios";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
 
-  const body = await req.json();
-
   try {
 
+    const body = await req.json();
+
     const response = await axios.post(
+
       "https://sandbox.api.pagseguro.com/checkouts",
+
       {
 
         reference_id:
@@ -27,7 +29,8 @@ export async function POST(req: Request) {
               country: "55",
               area: "98",
               number:
-                body.whatsapp.replace(/\D/g, "")
+                body.whatsapp
+                  .replace(/\D/g, "")
             }
           ]
 
@@ -35,19 +38,15 @@ export async function POST(req: Request) {
 
         items: [
           {
-            reference_id: "TRANSFORMAI",
-            name: "Ingresso TRANSFORMAI",
-            quantity: 1,
-            unit_amount: 10000
-          }
-        ],
+            reference_id:
+              "TRANSFORMAI",
 
-        payment_methods: [
-          {
-            type: "PIX"
-          },
-          {
-            type: "CREDIT_CARD"
+            name:
+              "Ingresso TRANSFORMAI",
+
+            quantity: 1,
+
+            unit_amount: 10000
           }
         ],
 
@@ -61,43 +60,52 @@ export async function POST(req: Request) {
       },
 
       {
+
         headers: {
+
           Authorization:
             `Bearer ${process.env.PAGBANK_TOKEN}`,
+
           "Content-Type":
             "application/json"
+
         }
+
       }
+
     );
+
+    console.log(response.data);
 
     // PEGAR LINK
 
-    const payLink =
-      response.data.links.find(
-        (link: { rel: string; href: string }) =>
-          link.rel === "PAY"
-      );
+    const payLink = response.data.links.find(
+      (link: { rel: string; href: string }) => link.rel === "PAY"
+    );
 
     return NextResponse.json({
-      checkout_url: payLink.href
+
+      checkout_url:
+        payLink?.href || null
+
     });
 
-  } catch (error: unknown) {
+  } catch (error) {
 
-    if (isAxiosError(error)) {
-      console.log(error.response?.data);
+    const axiosError = error instanceof axios.AxiosError ? error : null;
 
-      return NextResponse.json({
-        error: true,
-        details: error.response?.data
-      });
-    }
-
-    console.log(error);
+    console.log(
+      "PAGBANK ERROR:",
+      axiosError?.response?.data
+    );
 
     return NextResponse.json({
+
       error: true,
-      details: String(error)
+
+      details:
+        axiosError?.response?.data || (error instanceof Error ? error.message : "Unknown error")
+
     });
 
   }
