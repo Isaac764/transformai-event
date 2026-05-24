@@ -9,7 +9,7 @@ export async function POST(req: Request) {
 
     const response = await axios.post(
 
-      "https://sandbox.api.pagseguro.com/checkouts",
+      "https://api.pagseguro.com/checkouts",
 
       {
 
