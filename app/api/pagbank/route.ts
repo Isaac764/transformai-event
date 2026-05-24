@@ -1,10 +1,5 @@
-import axios from "axios";
+import axios, { isAxiosError } from "axios";
 import { NextResponse } from "next/server";
-
-interface Link {
-  rel: string;
-  href: string;
-}
 
 export async function POST(req: Request) {
 
@@ -15,19 +10,27 @@ export async function POST(req: Request) {
     const response = await axios.post(
       "https://sandbox.api.pagseguro.com/checkouts",
       {
-        reference_id: `TRANSFORMAI-${Date.now()}`,
+
+        reference_id:
+          `TRANSFORMAI-${Date.now()}`,
 
         customer: {
+
           name: body.nome,
+
           email: body.email,
+
           tax_id: "12345678909",
+
           phones: [
             {
               country: "55",
               area: "98",
-              number: body.whatsapp.replace(/\D/g, "")
+              number:
+                body.whatsapp.replace(/\D/g, "")
             }
           ]
+
         },
 
         items: [
@@ -48,7 +51,8 @@ export async function POST(req: Request) {
           }
         ],
 
-        redirect_url: `${process.env.NEXT_PUBLIC_URL}/sucesso`,
+        redirect_url:
+          `${process.env.NEXT_PUBLIC_URL}/sucesso`,
 
         payment_notification_urls: [
           `${process.env.NEXT_PUBLIC_URL}/api/webhook`
@@ -58,15 +62,21 @@ export async function POST(req: Request) {
 
       {
         headers: {
-          Authorization: `Bearer ${process.env.PAGBANK_TOKEN}`,
-          "Content-Type": "application/json"
+          Authorization:
+            `Bearer ${process.env.PAGBANK_TOKEN}`,
+          "Content-Type":
+            "application/json"
         }
       }
     );
 
-    // PEGAR URL DO PAGAMENTO
+    // PEGAR LINK
 
-    const payLink = response.data.links.find((link: Link) => link.rel === "PAY");
+    const payLink =
+      response.data.links.find(
+        (link: { rel: string; href: string }) =>
+          link.rel === "PAY"
+      );
 
     return NextResponse.json({
       checkout_url: payLink.href
@@ -74,7 +84,7 @@ export async function POST(req: Request) {
 
   } catch (error: unknown) {
 
-    if (axios.isAxiosError(error)) {
+    if (isAxiosError(error)) {
       console.log(error.response?.data);
 
       return NextResponse.json({
@@ -87,7 +97,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       error: true,
-      details: null
+      details: String(error)
     });
 
   }

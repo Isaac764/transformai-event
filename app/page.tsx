@@ -38,9 +38,17 @@ function handleSubmit() {
     return;
   }
 
-  // checkout futuramente
+  // SALVA TEMPORARIAMENTE
 
-  window.location.href = "/checkout";
+  localStorage.setItem(
+    "transformai-user",
+    JSON.stringify(form)
+  );
+
+  // REDIRECIONA
+
+  window.location.href = "/pagamento";
+
 }
 
   return (
@@ -536,6 +544,7 @@ function handleSubmit() {
             </div>
 
             <button
+            type="button"
               onClick={handleSubmit}
               disabled={
                 !form.nome ||

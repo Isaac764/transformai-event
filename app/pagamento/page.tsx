@@ -1,20 +1,66 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 
 export default function PagamentoPage() {
 
-  const [method, setMethod] = useState("pix");
+  const [loading, setLoading] = useState(false);
 
-  const pixCode =
-    "00020126360014BR.GOV.BCB.PIX0114+5598999999995204000053039865406100.005802BR5925TRANSFORMAI6009SAOLUIS62070503***6304ABCD";
+  async function handlePayment() {
 
-  function copyPixCode() {
+    setLoading(true);
 
-    navigator.clipboard.writeText(pixCode);
+    try {
 
-    alert("Código PIX copiado!");
+      // PEGAR DADOS
+
+      const formData =
+        localStorage.getItem("transformai-user");
+
+      if (!formData) {
+
+        alert("Dados não encontrados.");
+
+        setLoading(false);
+
+        return;
+
+      }
+
+      // CHAMAR API
+
+      const response = await fetch("/api/pagbank", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: formData
+      });
+
+      const data = await response.json();
+
+      // REDIRECIONAR PAGBANK
+
+      if (data.checkout_url) {
+
+        window.location.href =
+          data.checkout_url;
+
+      } else {
+
+        alert("Erro ao gerar pagamento.");
+
+      }
+
+    } catch (error) {
+
+      console.log(error);
+
+      alert("Erro ao processar pagamento.");
+
+    }
+
+    setLoading(false);
 
   }
 
@@ -48,7 +94,9 @@ export default function PagamentoPage() {
               <span>Vagas restantes</span>
 
               <span className="text-yellow-500 font-bold">
+
                 150
+
               </span>
 
             </div>
@@ -75,178 +123,90 @@ export default function PagamentoPage() {
 
         {/* PAGAMENTO */}
 
-        <div className="bg-zinc-900 border border-yellow-500/20 rounded-[40px] p-10">
+        <div className="bg-zinc-900 border border-yellow-500/20 rounded-[40px] p-10 flex flex-col justify-between">
 
-          <h2 className="text-6xl font-black mb-10">
+          <div>
 
-            PAGAMENTO
+            <h2 className="text-6xl font-black">
 
-          </h2>
+              PAGAMENTO
 
-          {/* MÉTODOS */}
+            </h2>
 
-          <div className="space-y-5">
+            <p className="mt-8 text-xl text-gray-400 leading-relaxed">
 
-            {/* PIX */}
+              Você será redirecionado para o ambiente
+              seguro do PagBank para escolher:
 
-            <div
-              onClick={() => setMethod("pix")}
-              className={`
-              cursor-pointer
-              w-full
-              p-8
-              rounded-3xl
-              border
-              text-left
-              transition-all
-              duration-300
-              ${
-                method === "pix"
-                  ? "border-green-500 bg-green-500/10"
-                  : "border-zinc-700 bg-black"
-              }
-              `}
-            >
+            </p>
 
-              <h3 className="text-4xl font-black text-green-500">
+            <div className="mt-10 space-y-5">
 
-                PIX
+              {/* PIX */}
 
-              </h3>
+              <div className="bg-black border border-green-500 rounded-3xl p-8">
 
-              <p className="mt-2 text-gray-400 text-lg">
+                <h3 className="text-4xl font-black text-green-500">
 
-                Aprovação instantânea
+                  PIX
 
-              </p>
+                </h3>
 
-            </div>
+                <p className="mt-2 text-gray-400">
 
-            {/* CARTÃO */}
+                  QR Code e código copia e cola
 
-            <div
-              onClick={() => setMethod("card")}
-              className={`
-              cursor-pointer
-              w-full
-              p-8
-              rounded-3xl
-              border
-              text-left
-              transition-all
-              duration-300
-              ${
-                method === "card"
-                  ? "border-yellow-500 bg-yellow-500/10"
-                  : "border-zinc-700 bg-black"
-              }
-              `}
-            >
+                </p>
 
-              <h3 className="text-4xl font-black text-yellow-500">
+              </div>
 
-                CARTÃO DE CRÉDITO
+              {/* CARTÃO */}
 
-              </h3>
+              <div className="bg-black border border-yellow-500 rounded-3xl p-8">
 
-              <p className="mt-2 text-gray-400 text-lg">
+                <h3 className="text-4xl font-black text-yellow-500">
 
-                Parcelamento disponível
+                  CARTÃO
 
-              </p>
+                </h3>
+
+                <p className="mt-2 text-gray-400">
+
+                  Crédito e débito
+
+                </p>
+
+              </div>
 
             </div>
 
           </div>
 
-          {/* CONTEÚDO DINÂMICO */}
+          {/* BOTÃO */}
 
-          <div className="mt-10">
+          <button
+            type="button"
+            onClick={handlePayment}
+            disabled={loading}
+            className="
+            w-full
+            mt-10
+            bg-green-500
+            hover:bg-green-400
+            disabled:opacity-50
+            transition
+            py-6
+            rounded-2xl
+            text-2xl
+            font-black
+            "
+          >
 
-            {/* PIX */}
+            {loading
+              ? "PROCESSANDO..."
+              : "IR PARA PAGAMENTO"}
 
-            <div className="mt-10">
-
-              {method === "pix" ? (
-
-                <div>
-
-                  <div className="bg-white rounded-3xl p-6 w-fit mx-auto">
-
-                    <Image
-                      src="/images/qrcode-pix.png"
-                      alt="QR Code PIX"
-                      width={280}
-                      height={280}
-                    />
-
-                  </div>
-
-                  <div className="bg-black border border-zinc-700 rounded-2xl p-5 mt-8 text-sm break-all">
-
-                    {pixCode}
-
-                  </div>
-
-                  <button
-                    onClick={copyPixCode}
-                    className="w-full mt-6 bg-green-500 hover:bg-green-400 transition py-5 rounded-2xl text-xl font-black"
-                  >
-
-                    COPIAR CÓDIGO PIX
-
-                  </button>
-
-                </div>
-
-              ) : (
-
-                <div className="space-y-5">
-
-                  <input
-                    placeholder="Número do cartão"
-                    className="w-full bg-black border border-zinc-700 rounded-2xl p-5 text-lg"
-                  />
-
-                  <input
-                    placeholder="Nome no cartão"
-                    className="w-full bg-black border border-zinc-700 rounded-2xl p-5 text-lg"
-                  />
-
-                  <div className="grid grid-cols-2 gap-5">
-
-                    <input
-                      placeholder="MM/AA"
-                      className="w-full bg-black border border-zinc-700 rounded-2xl p-5 text-lg"
-                    />
-
-                    <input
-                      placeholder="CVV"
-                      className="w-full bg-black border border-zinc-700 rounded-2xl p-5 text-lg"
-                    />
-
-                  </div>
-
-                </div>
-
-              )}
-
-            </div>
-
-            {/* BOTÃO */}
-
-            <button
-              onClick={() =>
-                window.location.href = "/sucesso"
-              }
-              className="w-full mt-10 bg-green-500 hover:bg-green-400 transition py-6 rounded-2xl text-2xl font-black"
-            >
-
-              FINALIZAR PAGAMENTO
-
-            </button>
-
-          </div>
+          </button>
 
         </div>
 

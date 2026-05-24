@@ -6,30 +6,47 @@ export async function POST(req: Request) {
 
   console.log(body);
 
-  // pagamento aprovado
+  // PAGAMENTO APROVADO
 
-  if (body.charges?.[0]?.status === "PAID") {
+  if (
+    body.charges?.[0]?.status === "PAID"
+  ) {
 
-    // salvar no sheets
+    // GOOGLE SHEETS
 
-    await axios.post(process.env.GOOGLE_SCRIPT_URL!, {
-      nome: body.customer.name,
-      email: body.customer.email,
-      whatsapp: body.customer.phones?.[0]?.number
-    });
+    await axios.post(
+      process.env.GOOGLE_SCRIPT_URL!,
+      {
+        nome:
+          body.customer.name,
 
-    // enviar email
+        email:
+          body.customer.email,
 
-    await fetch(`${process.env.NEXT_PUBLIC_URL}/api/send-email`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        nome: body.customer.name,
-        email: body.customer.email
-      })
-    });
+        whatsapp:
+          body.customer.phones?.[0]?.number
+      }
+    );
+
+    // EMAIL
+
+    await fetch(
+      `${process.env.NEXT_PUBLIC_URL}/api/send-email`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+        body: JSON.stringify({
+          nome:
+            body.customer.name,
+
+          email:
+            body.customer.email
+        })
+      }
+    );
 
   }
 
