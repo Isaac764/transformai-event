@@ -12,7 +12,7 @@ export async function POST(req: Request) {
 
     const response = await axios.post(
 
-      "https://sandbox.api.pagseguro.com/checkouts",
+      "https://sandbox.api.pagseguro.com/orders",
 
       {
 
@@ -31,7 +31,8 @@ export async function POST(req: Request) {
             {
               country: "55",
               area: cleanPhone.slice(0, 2),
-              number: cleanPhone.slice(2)
+              number: cleanPhone.slice(2),
+              type: "MOBILE"
             }
           ]
 
@@ -51,8 +52,32 @@ export async function POST(req: Request) {
           }
         ],
 
-        redirect_url:
-          `${process.env.NEXT_PUBLIC_URL}/sucesso`
+        qr_codes: [
+          {
+            amount: {
+              value: 10000
+            }
+          }
+        ],
+
+        charges: [
+          {
+            reference_id:
+              "TRANSFORMAI-CHARGE",
+
+            description:
+              "Ingresso TRANSFORMAI",
+
+            amount: {
+              value: 10000,
+              currency: "BRL"
+            },
+
+            payment_method: {
+              type: "PIX"
+            }
+          }
+        ]
 
       },
 
@@ -77,29 +102,37 @@ export async function POST(req: Request) {
       response.data
     );
 
-    // LOCALIZAR LINK
+    // QR CODE PIX
 
-    const payLink =
-      response.data.links?.find(
+    const qrCode =
+      response.data.qr_codes?.[0];
+
+    // LINK PAGAMENTO
+
+    const paymentLink =
+      qrCode?.links?.find(
         (link: { rel: string; href: string }) =>
-          link.rel === "PAY" ||
-          link.rel === "CHECKOUT" ||
-          link.rel === "PAYMENT"
+          link.rel === "PAY"
       );
-
-    console.log("PAY LINK:", payLink);
 
     return NextResponse.json({
 
       checkout_url:
-        payLink?.href || null
+        paymentLink?.href ||
+
+        qrCode?.links?.[0]?.href ||
+
+        null
 
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
 
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    const errorDetails = error instanceof axios.AxiosError ? error.response?.data : errorMessage;
+    const errorDetails = axios.isAxiosError(error)
+      ? error.response?.data || error.message
+      : error instanceof Error
+      ? error.message
+      : String(error);
 
     console.log(
       "PAGBANK ERROR:",
