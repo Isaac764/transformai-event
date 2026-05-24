@@ -1,10 +1,21 @@
 import axios from "axios";
 
-export async function POST(req: Request) {
+export async function POST(
+  req: Request
+) {
 
   const body = await req.json();
 
-  await axios.post(process.env.GOOGLE_SCRIPT_URL!, body);
+  await axios.post(
 
-  return Response.json({ ok: true });
+    process.env.GOOGLE_SCRIPT_URL!,
+
+    body
+
+  );
+
+  return Response.json({
+    success: true
+  });
+
 }

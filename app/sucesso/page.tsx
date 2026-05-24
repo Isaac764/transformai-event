@@ -1,6 +1,73 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect } from "react";
 
 export default function SucessoPage() {
+
+  useEffect(() => {
+
+    async function confirmarInscricao() {
+
+      try {
+
+        // PEGAR DADOS
+
+        const data =
+          localStorage.getItem(
+            "transformai-user"
+          );
+
+        if (!data) return;
+
+        const user =
+          JSON.parse(data);
+
+        // GOOGLE SHEETS
+
+        await fetch(
+          "/api/google-sheets",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+            body: JSON.stringify(user)
+          }
+        );
+
+        // E-MAIL
+
+        await fetch(
+          "/api/send-email",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+            body: JSON.stringify(user)
+          }
+        );
+
+        // LIMPAR STORAGE
+
+        localStorage.removeItem(
+          "transformai-user"
+        );
+
+      } catch (error) {
+
+        console.log(error);
+
+      }
+
+    }
+
+    confirmarInscricao();
+
+  }, []);
 
   return (
     <main className="relative min-h-screen flex items-center justify-center overflow-hidden">

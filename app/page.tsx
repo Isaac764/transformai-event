@@ -38,49 +38,34 @@ async function handleSubmit() {
     return;
   }
 
+  // SALVAR TEMPORARIAMENTE
+
+  localStorage.setItem(
+    "transformai-user",
+    JSON.stringify(form)
+  );
+
+  // REDIRECIONAR PAGBANK
+
   try {
+    const res = await fetch("/api/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form)
+    });
 
-    const response = await fetch(
-      "/api/pagbank",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type":
-            "application/json"
-        },
-        body: JSON.stringify(form)
-      }
-    );
+    const data = await res.json();
 
-    const data = await response.json();
-
-    console.log(data);
-
-    // REDIRECIONAR
-
-    if (data.checkout_url) {
-
-      window.location.href =
-        data.checkout_url;
-
+    if (data && data.checkout_url) {
+      window.location.href = data.checkout_url;
     } else {
-
-      alert(
-        "Erro ao gerar pagamento."
-      );
-
+      alert("Erro ao gerar pagamento.");
     }
 
   } catch (error) {
-
     console.log(error);
-
-    alert(
-      "Erro ao processar pagamento."
-    );
-
+    alert("Erro ao processar pagamento.");
   }
-
 }
 
   return (
