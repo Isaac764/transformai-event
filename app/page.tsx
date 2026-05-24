@@ -14,6 +14,7 @@ import {
 export default function Home() {
 
   const formRef = useRef<HTMLDivElement>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
 const [form, setForm] = useState({
   nome: "",
@@ -38,34 +39,62 @@ async function handleSubmit() {
     return;
   }
 
-  // SALVAR TEMPORARIAMENTE
-
-  localStorage.setItem(
-    "transformai-user",
-    JSON.stringify(form)
-  );
-
-  // REDIRECIONAR PAGBANK
+  setIsLoading(true);
 
   try {
-    const res = await fetch("/api/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form)
-    });
 
-    const data = await res.json();
+    const response =
+      await fetch(
 
-    if (data && data.checkout_url) {
-      window.location.href = data.checkout_url;
+        "/api/create-order",
+
+        {
+
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify(form)
+
+        }
+
+      );
+
+    const data =
+      await response.json();
+
+    console.log(data);
+
+    if (
+      data.checkout_url
+    ) {
+
+      window.location.href =
+        data.checkout_url;
+
     } else {
-      alert("Erro ao gerar pagamento.");
+
+      alert(
+        "Erro ao gerar pagamento."
+      );
+
     }
 
   } catch (error) {
+
     console.log(error);
-    alert("Erro ao processar pagamento.");
+
+    alert(
+      "Erro ao processar pagamento."
+    );
+
+  } finally {
+    setIsLoading(false);
   }
+
 }
 
   return (
@@ -89,7 +118,7 @@ async function handleSubmit() {
 
           {/* OVERLAY */}
 
-          <div className="absolute inset-0 bg-black/20" />
+          <div className="absolute inset-0 bg-black/50" />
 
           {/* GRADIENT */}
 
@@ -120,7 +149,7 @@ async function handleSubmit() {
                   TRANSFORMAI
                 </h1>
 
-                <p className="text-yellow-500 text-sm">
+                <p className="text-yellow-500 text-sm font-black">
                   A Mentalidade do Reino nos Negócios
                 </p>
 
@@ -142,7 +171,10 @@ async function handleSubmit() {
 
             {/* BOTÃO */}
 
-            <button className="hidden lg:block bg-green-500 hover:bg-green-400 transition px-8 py-4 rounded-xl font-black">
+            <button 
+              onClick={scrollToForm}
+              className="hidden lg:block bg-green-500 hover:bg-green-400 transition px-8 py-4 rounded-xl font-black"
+            >
 
               GARANTIR MINHA VAGA
 
@@ -158,12 +190,13 @@ async function handleSubmit() {
 
           <div className="flex flex-col lg:grid lg:grid-cols-2 items-center gap-10">
 
-            {/* ESQUERDA */}
+            {/* TEXTO */}
 
             <motion.div
               initial={{ opacity: 0, x: -60 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 1 }}
+              className="order-1 w-full"
             >
 
               {/* BADGE */}
@@ -176,7 +209,7 @@ async function handleSubmit() {
 
               {/* TÍTULO */}
 
-              <h1 className="text-6xl md:text-7xl lg:text-[110px] font-black leading-none">
+              <h1 className="text-6xl md:text-7xl lg:text-[110px] font-black leading-none text-amber-400">
 
                 TRANSFORMAI
 
@@ -184,7 +217,7 @@ async function handleSubmit() {
 
               {/* SUB */}
 
-              <h2 className="text-3xl md:text-5xl mt-5 font-light leading-tight max-w-3xl">
+              <h2 className="text-3xl md:text-5xl mt-5 font-black leading-tight max-w-3xl">
 
                 A MENTALIDADE DO REINO NOS NEGÓCIOS
 
@@ -199,109 +232,29 @@ async function handleSubmit() {
 
               </p>
 
-              {/* BENEFÍCIOS */}
-
-              <div className="
-                grid
-                grid-cols-2
-                md:grid-cols-4
-                gap-8
-                mt-16
-                order-3
-                lg:order-none
-                ">
-
-                {/* ITEM */}
-
-                <div className="text-center">
-
-                  <div className="w-20 h-20 rounded-full border border-yellow-500 flex items-center justify-center mx-auto mb-5">
-
-                    <FaLightbulb className="text-yellow-500 text-3xl" />
-
-                  </div>
-
-                  <p className="font-bold text-sm leading-relaxed">
-
-                    ENSINOS
-                    <br />
-                    PRÁTICOS
-
-                  </p>
-
-                </div>
-
-                {/* ITEM */}
-
-                <div className="text-center">
-
-                  <div className="w-20 h-20 rounded-full border border-yellow-500 flex items-center justify-center mx-auto mb-5">
-
-                    <FaHandshake className="text-yellow-500 text-3xl" />
-
-                  </div>
-
-                  <p className="font-bold text-sm leading-relaxed">
-
-                    NETWORKING
-                    <br />
-                    ESTRATÉGICO
-
-                  </p>
-
-                </div>
-
-                {/* ITEM */}
-
-                <div className="text-center">
-
-                  <div className="w-20 h-20 rounded-full border border-yellow-500 flex items-center justify-center mx-auto mb-5">
-
-                    <FaBrain className="text-yellow-500 text-3xl" />
-
-                  </div>
-
-                  <p className="font-bold text-sm leading-relaxed">
-
-                    MENTALIDADE
-                    <br />
-                    DE REINO
-
-                  </p>
-
-                </div>
-
-                {/* ITEM */}
-
-                <div className="text-center">
-
-                  <div className="w-20 h-20 rounded-full border border-yellow-500 flex items-center justify-center mx-auto mb-5">
-
-                    <FaBullseye className="text-yellow-500 text-3xl" />
-
-                  </div>
-
-                  <p className="font-bold text-sm leading-relaxed">
-
-                    PROPÓSITO
-                    <br />
-                    E IMPACTO
-
-                  </p>
-
-                </div>
-
-              </div>
+              <button 
+                onClick={scrollToForm}
+                className="mt-10 bg-green-500 hover:bg-green-400 transition-all px-10 py-5 rounded-2xl font-black text-xl shadow-lg shadow-green-500/20"
+              >
+                QUERO ME INSCREVER AGORA
+              </button>
 
             </motion.div>
 
-            {/* DIREITA */}
+            {/* FOTO DAS PESSOAS */}
 
             <motion.div
               initial={{ opacity: 0, x: 60 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 1 }}
-              className="relative flex justify-center order-2 lg:order-none"
+              className="
+              relative
+              flex
+              justify-center
+              order-2
+              lg:order-none
+              w-full
+              "
             >
 
               {/* SOMBRA */}
@@ -317,46 +270,100 @@ async function handleSubmit() {
               <Image
                 src="/images/pessoas.png"
                 alt="Pessoas"
-                width={1200}
-                height={1200}
+                width={750}
+                height={800}
                 priority
                 className="
                 relative z-20
                 object-contain
                 scale-125
                 lg:scale-[1.55]
-                max-w-[450px]
+                max-w-[420px]
+                sm:max-w-[520px]
                 md:max-w-[650px]
                 lg:max-w-[1000px]
                 mx-auto
                 drop-shadow-[0_40px_40px_rgba(0,0,0,0.95)]
-                mt-10
+                mt-6
                 "
               />
 
             </motion.div>
 
           </div>
-
         </div>
+      </section>
 
+      {/* BENEFÍCIOS */}
+      <section className="relative z-20 py-24 bg-black">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-10">
+            <p className="text-yellow-500 text-xs md:text-sm font-bold tracking-widest uppercase">
+              O QUE VOCÊ VAI VIVER
+            </p>
+            <h2 className="text-2xl md:text-4xl font-black mt-2">
+              OBJETIVOS DO EVENTO
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 w-full">
+            <div className="bg-[#0b0b0b]/90 border border-yellow-500/20 rounded-2xl p-5 lg:p-7 text-center hover:border-yellow-500 transition-all duration-300">
+              <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-full border border-yellow-500 flex items-center justify-center mx-auto mb-5">
+                <FaLightbulb className="text-yellow-500 text-2xl lg:text-4xl" />
+              </div>
+              <h3 className="font-black text-sm lg:text-lg leading-tight uppercase">
+                ENSINOS<br />PRÁTICOS
+              </h3>
+              <p className="text-gray-400 text-xs lg:text-sm mt-4 leading-relaxed">
+                Aplicações práticas para negócios.
+              </p>
+            </div>
+
+            <div className="bg-[#0b0b0b]/90 border border-yellow-500/20 rounded-2xl p-5 lg:p-7 text-center hover:border-yellow-500 transition-all duration-300">
+              <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-full border border-yellow-500 flex items-center justify-center mx-auto mb-5">
+                <FaHandshake className="text-yellow-500 text-2xl lg:text-4xl" />
+              </div>
+              <h3 className="font-black text-sm lg:text-lg leading-tight uppercase">
+                NETWORKING<br />ESTRATÉGICO
+              </h3>
+              <p className="text-gray-400 text-xs lg:text-sm mt-4 leading-relaxed">
+                Empresários e líderes que compartilham a mesma visão.
+              </p>
+            </div>
+
+            <div className="bg-[#0b0b0b]/90 border border-yellow-500/20 rounded-2xl p-5 lg:p-7 text-center hover:border-yellow-500 transition-all duration-300">
+              <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-full border border-yellow-500 flex items-center justify-center mx-auto mb-5">
+                <FaBrain className="text-yellow-500 text-2xl lg:text-4xl" />
+              </div>
+              <h3 className="font-black text-sm lg:text-lg leading-tight uppercase">
+                MENTALIDADE<br />DE REINO
+              </h3>
+              <p className="text-gray-400 text-xs lg:text-sm mt-4 leading-relaxed">
+                Desenvolva uma mentalidade alinhada ao propósito de Deus.
+              </p>
+            </div>
+
+            <div className="bg-[#0b0b0b]/90 border border-yellow-500/20 rounded-2xl p-5 lg:p-7 text-center hover:border-yellow-500 transition-all duration-300">
+              <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-full border border-yellow-500 flex items-center justify-center mx-auto mb-5">
+                <FaBullseye className="text-yellow-500 text-2xl lg:text-4xl" />
+              </div>
+              <h3 className="font-black text-sm lg:text-lg leading-tight uppercase">
+                PROPÓSITO<br />E IMPACTO
+              </h3>
+              <p className="text-gray-400 text-xs lg:text-sm mt-4 leading-relaxed">
+                Impacto ao criar um legado.
+              </p>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* COMO FUNCIONA */}
-
-<section className="py-20 bg-black border-t border-yellow-500/10 overflow-hidden">
-
-  <div className="container mx-auto px-4 lg:px-6">
-
-    {/* TÍTULO */}
-
-    <h2 className="text-4xl md:text-6xl lg:text-7xl font-black text-center leading-tight mb-16">
-
-      COMO FUNCIONA SUA
-      <br />
-      INSCRIÇÃO
-
-    </h2>
+      <section className="py-20 bg-black border-t border-yellow-500/10 overflow-hidden">
+        <div className="container mx-auto px-4 lg:px-6">
+          <h2 className="text-4xl md:text-6xl lg:text-7xl font-black text-center leading-tight mb-16">
+            COMO FUNCIONA SUA<br />INSCRIÇÃO
+          </h2>
 
     {/* MOBILE SCROLL */}
 
@@ -534,6 +541,8 @@ async function handleSubmit() {
             <div className="grid grid-cols-1 gap-6">
 
               <input
+              type="text"
+              value={form.nome}
               placeholder="Nome completo"
               className="w-full bg-black border border-zinc-700 rounded-2xl p-6 text-lg"
               onChange={(e) =>
@@ -545,6 +554,8 @@ async function handleSubmit() {
             />
 
               <input
+              type="email"
+              value={form.email}
               placeholder="E-mail"
               className="w-full bg-black border border-zinc-700 rounded-2xl p-6 text-lg"
               onChange={(e) =>
@@ -556,6 +567,8 @@ async function handleSubmit() {
             />
 
               <input
+              type="tel"
+              value={form.whatsapp}
               placeholder="WhatsApp (DDD + número)"
               className="w-full bg-black border border-zinc-700 rounded-2xl p-6 text-lg"
               onChange={(e) =>
@@ -571,7 +584,7 @@ async function handleSubmit() {
             <button
             type="button"
               onClick={handleSubmit}
-              disabled={
+              disabled={isLoading ||
                 !form.nome ||
                 !form.email ||
                 !form.whatsapp
@@ -593,7 +606,7 @@ async function handleSubmit() {
               "
             >
 
-              GARANTIR MINHA VAGA
+              {isLoading ? "PROCESSANDO..." : "GARANTIR MINHA VAGA"}
 
             </button>
 
