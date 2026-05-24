@@ -52,32 +52,21 @@ export async function POST(req: Request) {
           }
         ],
 
-        qr_codes: [
-          {
-            amount: {
-              value: 10000
-            }
-          }
-        ],
+        checkout_settings: {
 
-        charges: [
-          {
-            reference_id:
-              "TRANSFORMAI-CHARGE",
+          success_url:
+            `${process.env.NEXT_PUBLIC_URL}/sucesso`,
 
-            description:
-              "Ingresso TRANSFORMAI",
-
-            amount: {
-              value: 10000,
-              currency: "BRL"
-            },
-
-            payment_method: {
+          payment_methods: [
+            {
               type: "PIX"
+            },
+            {
+              type: "CREDIT_CARD"
             }
-          }
-        ]
+          ]
+
+        }
 
       },
 
@@ -102,50 +91,31 @@ export async function POST(req: Request) {
       response.data
     );
 
-    // QR CODE PIX
-
-    const qrCode =
-      response.data.qr_codes?.[0];
-
-    // LINK PAGAMENTO
-
     const paymentLink =
-      qrCode?.links?.find(
-        (link: { rel: string; href: string }) =>
+      response.data.links?.find(
+        (link: { rel?: string; href?: string }) =>
           link.rel === "PAY"
       );
 
     return NextResponse.json({
 
       checkout_url:
-        paymentLink?.href ||
-
-        qrCode?.links?.[0]?.href ||
-
-        null
+        paymentLink?.href || null
 
     });
 
   } catch (error: unknown) {
 
-    const errorDetails = axios.isAxiosError(error)
-      ? error.response?.data || error.message
-      : error instanceof Error
-      ? error.message
-      : String(error);
+    const err = error as {
+      response?: { data?: unknown };
+      message?: string;
+    };
 
-    console.log(
-      "PAGBANK ERROR:",
-      errorDetails
-    );
+    const details = err.response?.data ?? (err.message ?? String(error));
 
-    return NextResponse.json({
+    console.log("PAGBANK ERROR:", details);
 
-      error: true,
-
-      details: errorDetails
-
-    });
+    return NextResponse.json({ error: true, details });
 
   }
 
