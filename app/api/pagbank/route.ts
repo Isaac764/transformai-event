@@ -6,10 +6,11 @@ export async function POST(req: Request) {
   try {
 
     const body = await req.json();
-
+    const cleanPhone = body.telefone.replace(/\D/g, "");
     const response = await axios.post(
 
-      "https://api.pagseguro.com/",
+
+      "https://sandbox.api.pagseguro.com/checkouts",
 
       {
 
@@ -22,17 +23,15 @@ export async function POST(req: Request) {
 
           email: body.email,
 
-          tax_id: "23544302802",
+          tax_id: "54549013006",
 
           phones: [
-            {
-              country: "55",
-              area: "98",
-              number:
-                body.whatsapp
-                  .replace(/\D/g, "")
-            }
-          ]
+              {
+                country: "55",
+                area: cleanPhone.slice(0, 2),
+                number: cleanPhone.slice(2)
+              }
+            ]
 
         },
 
@@ -52,6 +51,7 @@ export async function POST(req: Request) {
 
         redirect_url:
           `${process.env.NEXT_PUBLIC_URL}/sucesso`,
+ 
 
         payment_notification_urls: [
           `${process.env.NEXT_PUBLIC_URL}/api/webhook`
@@ -80,8 +80,11 @@ export async function POST(req: Request) {
     // PEGAR LINK
 
     const payLink = response.data.links.find(
-      (link: { rel: string; href: string }) => link.rel === "PAY"
-    );
+  (link: { rel: string; href: string }) =>
+    link.rel === "PAY" ||
+    link.rel === "CHECKOUT" ||
+    link.rel === "PAYMENT"
+  );
 
     return NextResponse.json({
 

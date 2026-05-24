@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   const body = await req.json();
 
   await resend.emails.send({
-    from: "TRANSFORMAI <contato@transformai.com>",
+    from: "onboarding@resend.dev",
     to: body.email,
     subject: "Inscrição Confirmada",
     html: `
@@ -24,7 +24,7 @@ export async function POST(req: Request) {
         </p>
 
         <img
-          src="https://seudominio.com/cartao-confirmacao.png"
+          src="${process.env.NEXT_PUBLIC_URL}/images/cartao-confirmacao.png"
           width="400"
         />
 

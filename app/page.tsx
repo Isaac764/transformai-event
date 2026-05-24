@@ -171,7 +171,7 @@ async function handleSubmit() {
 
         <div className="relative z-20 container mx-auto px-6 pt-10 lg:pt-20">
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-10">
+          <div className="flex flex-col lg:grid lg:grid-cols-2 items-center gap-10">
 
             {/* ESQUERDA */}
 
@@ -216,7 +216,15 @@ async function handleSubmit() {
 
               {/* BENEFÍCIOS */}
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16">
+              <div className="
+                grid
+                grid-cols-2
+                md:grid-cols-4
+                gap-8
+                mt-16
+                order-3
+                lg:order-none
+                ">
 
                 {/* ITEM */}
 
@@ -308,7 +316,7 @@ async function handleSubmit() {
               initial={{ opacity: 0, x: 60 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 1 }}
-              className="relative flex justify-center"
+              className="relative flex justify-center order-2 lg:order-none"
             >
 
               {/* SOMBRA */}
